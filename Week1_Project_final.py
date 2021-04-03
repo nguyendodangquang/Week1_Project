@@ -13,12 +13,9 @@ while True:
     time.sleep(random.randrange(3, 6))
     url = 'https://tiki.vn/laptop-may-vi-tinh-linh-kien/c1846?page=' + str(page)
     driver.get(url)
-    # headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'}
-    # r = requests.get(url, headers=headers)
+
     time.sleep(random.randrange(4, 6))
-    # end = driver.find_element_by_tag_name('html')
-    # end.send_keys(Keys.END)
-    time.sleep(1)
+
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     main = soup.find('div', {'data-view-id':'product_list_container'})
     products = main.find_all('a', {'class':'product-item'})
@@ -35,6 +32,7 @@ while True:
             price = product.find('div', {'class':'price-discount__price'}).text
             img = product.img['src']
             purl = product['href']
+            
             if 'tiki.vn' in purl:
                 purl = 'https:' + purl
             else:

@@ -1,36 +1,76 @@
 from bs4 import BeautifulSoup
-import requests, time
+import requests, time, random
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
-url = 'https://tiki.vn/laptop-may-vi-tinh/c1846?page=1&src=c.1846.hamburger_menu_fly_out_banner'
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'}
-r = requests.get(url, headers=headers)
-lis = []
+page = 1
+driver = webdriver.Chrome('C:/Users/Dang Quang/Desktop/chromedriver.exe')
+data = []
 
-soup = BeautifulSoup(r.text, 'html.parser')
-print(soup.prettify()[:1000])
+while True:
+    time.sleep(random.randrange(3, 6))
+    url = 'https://tiki.vn/laptop-may-vi-tinh-linh-kien/c1846?page=' + str(page)
+    driver.get(url)
+    time.sleep(3)
 
-main = soup.find('div', {'data-view-id':'product_list_container'})
-print(main.prettify())
-products = main.find_all('a', {'class':'product-item'})
-for product in products:
-    name = product.find('div', {'class':'name'}).text
-    price = product.find('div', {'class':'price-discount__price'}).text
-    img = product.img['src']
-    purl = product['href']
-    if product.find('div', {'class':'price-discount__discount'}):
-        discount = product.find('div', {'class':'price-discount__discount'}).text
-    if product.find('div', {'class':'item'}):
-        tikinow = product.find('div', {'class':'item'}).img['src']
-    if product.find('div', {'class':'badge-under-price'}).img:
-        badge = product.find('div', {'class':'badge-under-price'}).img['src']
-    if product.find('div', {'class':'badge-benefits'}).img:
-        zero = product.find('div', {'class':'badge-benefits'}).img['src']
-    if product.find('div', {'class':'review'}).text:
-        reviews = product.find('div', {'class':'review'}).text
-    if product.find('div', {'class':'rating__average'})['style']:
-        stars = product.find('div', {'class':'rating__average'})['style']
-    # if product.find('div', {'class':'freegift-list'}):
-    #     gift = product.find('div', {'class':'freegift-list'}).img['src']
+    # driver.implicitly_wait(50)
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    main = soup.find('div', {'data-view-id':'product_list_container'})
+    products = main.find_all('a', {'class':'product-item'})
+    if len(products) == 0:
+        break
+
+    print(url + ' Number of products: ' + str(len(products)))
+    for product in products:
+        try:
+            name = product.find('div', {'class':'name'}).text
+            price = product.find('div', {'class':'price-discount__price'}).text
+            img = product.img['src']
+            purl = product['href']
+            if product.find('div', {'class':'price-discount__discount'}):
+                discount = product.find('div', {'class':'price-discount__discount'}).text
+            else:
+                discount = 'No'
+
+            if product.find('div', {'class':'item'}):
+                tikinow = 'Yes'
+            else:
+                tikinow = 'No'
+
+            if product.find('div', {'class':'badge-under-price'}).img:
+                badge = 'Yes'
+            else:
+                badge = 'No'
+
+            if product.find('div', {'class':'badge-benefits'}).img:
+                zero = 'Yes'
+            else:
+                zero = 'No'
+
+            if product.find('div', {'class':'review'}):
+                reviews = product.find('div', {'class':'review'}).text[1:-1]
+            else:
+                reviews = 'Not available'
+
+            if product.find('div', {'class':'rating__average'}):
+                stars = int(product.find('div', {'class':'rating__average'})['style'][6:][0:-1])
+            else:
+                stars = 'Not available'
+                
+            if product.find('div', {'class':'freegift-list'}):
+                gift = 'Yes'
+            else:
+                gift = 'No'
+            d = {'Product name': name, 'Price': price, 'Product Image': img, 'Product Url': purl, 'Discount': discount, 'Tikinow': tikinow, 'Badge under price':badge, 'Installment': zero, 'Reviews': reviews, 'Number of Stars': stars, 'Gift': gift}
+            data.append(d)
+        except:
+            print('There is an error when scrapping')
+        
+    page += 1
+
+productdata = pd.DataFrame(data=data, columns = data[0].keys())
+productdata.to_csv('C:/Users/Dang Quang/Desktop/result.csv', index=False)
 
 # To-do: go to each page
 # To-do: Use sleep to fake out
