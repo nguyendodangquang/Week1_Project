@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
-import time, random
+import time, random, re
 import pandas as pd
 
 driver = webdriver.Chrome('C:/Users/Dang Quang/Desktop/chromedriver.exe') # need to download chromedriver.exe and change the path
@@ -25,40 +25,39 @@ while True:
     for product in products:
         try:
             name = product.find('div', {'class':'name'}).text
-            if name[0:2] == 'Ad':
+            if name[0:2] == 'Ad':                                                         #product name
                 name = name[2:]
-            price = product.find('div', {'class':'price-discount__price'}).text
-            img = product.img['src']
-            purl = product['href']
-            
-            if 'tiki.vn' in purl:
+            price = int(re.sub('\.', '', product.find('div', {'class':'price-discount__price'}).text[0:-1]))    #price
+            img = product.img['src']                                                #product image
+            purl = product['href']                                                  #url
+            if 'tiki.vn' in purl:                                                   #some scraped URLs don't contain the Tiki.vn, so this adds them when needed
                 purl = 'https:' + purl
             else:
                 purl = 'https://tiki.vn' + purl
-            if product.find('div', {'class':'price-discount__discount'}):
+            if product.find('div', {'class':'price-discount__discount'}):           #Price Discount
                 discount = product.find('div', {'class':'price-discount__discount'}).text
             else:
                 discount = 'No'
 
-            if product.find('div', {'class':'item'}):
+            if product.find('div', {'class':'item'}):                               #TikiNow
                 tikinow = 'Yes'
             else:
                 tikinow = 'No'
 
-            if product.find('div', {'class':'badge-under-price'}).img:
+            if product.find('div', {'class':'badge-under-price'}).img:              #Re Hon Hoan Tien
                 badge = 'Yes'
             else:
                 badge = 'No'
 
-            if product.find('div', {'class':'badge-benefits'}).img:
+            if product.find('div', {'class':'badge-benefits'}).img:                 #Hot price badge
                 zero = 'Yes'
             else:
                 zero = 'No'
 
-            if product.find('div', {'class':'review'}):
-                reviews = product.find('div', {'class':'review'}).text[1:-1]
+            if product.find('div', {'class':'review'}):                             #Reviews
+                reviews = int(product.find('div', {'class':'review'}).text[1:-1])  
             else:
-                reviews = 'Not available'
+                reviews = 0
 
             if product.find('div', {'class':'rating__average'}):
                 stars = int(product.find('div', {'class':'rating__average'})['style'].split()[1][0:-1].rstrip('%'))/20

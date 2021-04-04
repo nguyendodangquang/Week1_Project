@@ -5,15 +5,15 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager #install chromedriver
 options = webdriver.ChromeOptions()
-options.add_argument('-headless') # since we run selenium on Google Colab so we don't want a chrome browser to open, so it will run in the background.
+options.add_argument('-headless') # since we run selenium on Google Colab so we don't want a chrome browser opens, so it will run in the background
 options.add_argument('-no-sandbox')
 options.add_argument('-disable-dev-shm-usage')
 options.add_argument("--incognito")
 driver = webdriver.Chrome('chromedriver',options=options)
-# driver.implicitly_wait(30)  # We let selenium wait for few seconds for all javascript script to load before returning the result of HTML. For this, we can use sleep() insteed.
+# driver.implicitly_wait(30)  # we let selenium to wait for few seconds for all javascript script done before return the result of HTML, but we can use sleep() insteed.
 
 from bs4 import BeautifulSoup
-import time, random
+import time, random, re
 import pandas as pd
 
 # driver = webdriver.Chrome('C:/Users/Dang Quang/Desktop/chromedriver.exe')
@@ -53,9 +53,9 @@ while True:
     for product in products:
         try:
             name = product.find('div', {'class':'name'}).text
-            if name[0:2] == 'Ad':                                                   #product name
+            if name[0:2] == 'Ad':                                                         #product name
                 name = name[2:]
-            price = product.find('div', {'class':'price-discount__price'}).text     #price
+            price = int(re.sub('\.', '', product.find('div', {'class':'price-discount__price'}).text[0:-1]))    #price
             img = product.img['src']                                                #product image
             purl = product['href']                                                  #url
             if 'tiki.vn' in purl:                                                   #some scraped URLs don't contain the Tiki.vn, so this adds them when needed
@@ -83,9 +83,9 @@ while True:
                 zero = 'No'
 
             if product.find('div', {'class':'review'}):                             #Reviews
-                reviews = product.find('div', {'class':'review'}).text[1:-1]  
+                reviews = int(product.find('div', {'class':'review'}).text[1:-1])  
             else:
-                reviews = 'Not available'
+                reviews = 0
 
             if product.find('div', {'class':'rating__average'}):
                 stars = int(product.find('div', {'class':'rating__average'})['style'].split()[1][0:-1].rstrip('%'))/20
@@ -106,5 +106,5 @@ while True:
 result = pd.DataFrame(data=data, columns = data[0].keys())
 
 from google.colab import files
-result.to_csv('result.csv') 
-files.download('result.csv')
+result.to_csv('./result.csv')
+# files.download('result.csv')
