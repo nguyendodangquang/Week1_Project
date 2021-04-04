@@ -5,12 +5,12 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager #install chromedriver
 options = webdriver.ChromeOptions()
-options.add_argument('-headless') # since we run selenium on Google Colab so we don't want a chrome browser opens, so it will run in the background
+options.add_argument('-headless') # since we run selenium on Google Colab so we don't want a chrome browser to open, so it will run in the background.
 options.add_argument('-no-sandbox')
 options.add_argument('-disable-dev-shm-usage')
 options.add_argument("--incognito")
 driver = webdriver.Chrome('chromedriver',options=options)
-# driver.implicitly_wait(30)  # we let selenium to wait for few seconds for all javascript script done before return the result of HTML, but we can use sleep() insteed.
+# driver.implicitly_wait(30)  # We let selenium wait for few seconds for all javascript script to load before returning the result of HTML. For this, we can use sleep() insteed.
 
 from bs4 import BeautifulSoup
 import time, random
