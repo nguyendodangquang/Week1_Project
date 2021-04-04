@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 import requests, time, random, re
 import pandas as pd
 
@@ -65,7 +64,7 @@ while True:
             if product.find('div', {'class':'rating__average'}):
                 stars = int(product.find('div', {'class':'rating__average'})['style'].split()[1][0:-1].rstrip('%'))/20
             else:
-                stars = 'N/A'
+                stars = 'Not available'
 
             if product.find('div', {'class':'freegift-list'}):
                 gift = 'Yes'
