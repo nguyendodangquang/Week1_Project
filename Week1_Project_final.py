@@ -1,12 +1,11 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
-import requests, time, random, re
+import time, random
 import pandas as pd
 
-driver = webdriver.Chrome('C:/Users/Dang Quang/Desktop/chromedriver.exe')
+driver = webdriver.Chrome('C:/Users/Dang Quang/Desktop/chromedriver.exe') # need to download chromedriver.exe and change the path
 page = 1
 data = []
-
 
 while True:
     time.sleep(random.randrange(3, 6))
@@ -79,8 +78,4 @@ while True:
 
 result = pd.DataFrame(data=data, columns = data[0].keys())
 
-result.to_csv('C:/Users/Dang Quang/Desktop/result.csv', index = False)
-
-# To-do: go to each page
-# To-do: Use sleep to fake out
-# To-do: make a table of data
+result.to_csv('C:/Users/Dang Quang/Desktop/result.csv', index = False) # need to change the path to save file .csv
