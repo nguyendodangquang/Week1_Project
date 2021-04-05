@@ -8,11 +8,10 @@ page = 1
 data = []
 
 while True:
-    time.sleep(random.randrange(3, 6))
     url = 'https://tiki.vn/laptop-may-vi-tinh-linh-kien/c1846?page=' + str(page)
     driver.get(url)
 
-    time.sleep(random.randrange(4, 6))
+    time.sleep(3)
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     main = soup.find('div', {'data-view-id':'product_list_container'})
